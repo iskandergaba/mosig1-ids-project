@@ -11,9 +11,7 @@ DOCKER = docker
 	$(JC) $(JCFLAGS) $*.java
 
 CLASSES = \
-		  Client.java \
-		  ClientGUI.java \
-		  Messenger.java \
+		  Main.java \
 
 default: docker classes
 

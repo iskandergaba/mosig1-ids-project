@@ -3,56 +3,39 @@
 + GABA Iskander
 + MASALYGINA Kseniia
 
-# How to run the program
+## RMI vs. RabbitMQ
+RabbitMQ, duh.
+
+## How to run the program
 Compile the Java classes and binary files.
 ~~~~
 cd src
 make
 ~~~~
 
-Start a chat clients like this:
+Start a chat `Main` like this:
 ~~~~
 cd ../class
-java -cp .:../lib/* Client
+java -cp .:../lib/* Main topology-connected
 ~~~~
 
-Or start chat GUI clients like this:
-~~~~
-cd ../class
-java -cp .:../lib/* ClientGUI
-~~~~
-
-Or even a mixture of both! They will still be able to communicate fine.
-
-# Docker
+## Docker
 For convenience, we used the latest RabbitMQ broker Docker version. It will spin up for you automatically from the `Makefile`
 
-# Clean
+## Clean
 Stop the RabbitMQ broker Docker container, remove it, and remove compiled `.class` files.
 ~~~~
 cd ../src
 make clean
 ~~~~
 
-# Implemented Features
-+ Chat application
-+ Join the chat room.
-+ Leave the chat room.
-+ Request history.
-+ Send private messages to specific clients (terminal version).
-+ Broadcast messages to chat room.
-+ Keep a list of connected users updated and prevent duplicate usernames.
+## Implemented Features
++ Parse an adjacency matrix, check it represents a connected graph, and make RabbitMQ nodes from it.
++ Find the shortest path between each two nodes and create a routing table for each node such that a node knows just the next hop it should make in order to reach a given target node.
++ RabbitMQ nodes can send, route, and receive messages.
 
 ## Bonus
-+ Usage of Docker version of RabbitMQ.
-+ Graphical User Interface.
 
 # System Requirements
 + OpenJDK v11 or higher.
-+ Docker v19 or higher up and running.
-
-# Comparison with the previous solution
-RabbitMQ is more robust, flexible, versatile. It is easier to work with. It has multiple client libraries.
-With RabbitMQ we used a new architecture without server. That's why chat history is now saved on the client's machine.
-Messages are now saved after every public message is sent. We don't have to worry about a central coordinating node being down anymore. 
-The number of lines of code is less than in RMI. 
++ Docker v19 or higher up and running. 
