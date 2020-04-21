@@ -1,11 +1,15 @@
 import java.io.Serializable;
 
-public class Message implements Serializable{
+public class Message implements Serializable {
+
+	private static final long serialVersionUID = 1234L;
+
 	public enum Direction {
 		Left, Right, Direct
 	}
+
 	private int id;
-	private String dest; 
+	private String dest;
 	private int src;
 	private String message;
 	private Direction direction = Direction.Direct;
@@ -16,8 +20,8 @@ public class Message implements Serializable{
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("M").append(id).append(": ").append(message).append(" to: ").append(dest)
-				.append(", from: ").append(src);
+		sb.append("M").append(id).append(": ").append(message).append(" to: ").append(dest).append(", from: ")
+				.append(src);
 		return sb.toString();
 	}
 

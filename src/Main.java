@@ -13,7 +13,8 @@ import java.util.concurrent.TimeoutException;
 public class Main {
 
     private static int nodeCount;
-    public static void main(String[] args) throws IOException, TimeoutException  {
+
+    public static void main(String[] args) throws IOException, TimeoutException {
 
         if (args.length < 1) {
             System.out.println("Missing argument: topology description file");
@@ -67,51 +68,51 @@ public class Main {
         int msgCounter = 0;
         Message msg;
         while (exiting) {
-            System.out.println("\nChoose action: \n 1. Send message on physical level \n 2. SendRight on virtual level \n 3. SendLeft on virtual level \n 4. Exit");
+            System.out.println(
+                    "\nChoose action: \n 1. Send message on physical level \n 2. SendRight on virtual level \n 3. SendLeft on virtual level \n 4. Exit");
             action = scanner2.nextLine();
             switch (action) {
                 case "1":
-                msgCounter++;
-                System.out.println("<sender> <destination @> <message>");
-                physicalID = scanner2.nextInt();
-                destID = scanner2.next();
-                message = scanner2.nextLine();
-                msg = new Message(msgCounter);
-                msg.setMessage(message);
-                msg.setSource(physicalID);
-                msg.setDestination(destID);
-                msg.setDirection(Message.Direction.Direct);
-                //System.out.println(node s.get(physicalID).returnID());
-                nodes.get(physicalID).send(msg);
-                break;
+                    msgCounter++;
+                    System.out.println("<sender> <destination @> <message>");
+                    physicalID = scanner2.nextInt();
+                    destID = scanner2.next();
+                    message = scanner2.nextLine();
+                    msg = new Message(msgCounter);
+                    msg.setMessage(message);
+                    msg.setSource(physicalID);
+                    msg.setDestination(destID);
+                    msg.setDirection(Message.Direction.Direct);
+                    // System.out.println(node s.get(physicalID).returnID());
+                    nodes.get(physicalID).send(msg);
+                    break;
                 case "2":
-                msgCounter++;
-                System.out.println("<virtual sender> <message>");
-                virtualID = scanner2.nextInt();
-                message = scanner2.nextLine();
-                msg = new Message(msgCounter);
-                msg.setMessage(message);
-                msg.setSource(virtualID);
-                tourNN.sendRight(msg, nodes);
-                break;
+                    msgCounter++;
+                    System.out.println("<virtual sender> <message>");
+                    virtualID = scanner2.nextInt();
+                    message = scanner2.nextLine();
+                    msg = new Message(msgCounter);
+                    msg.setMessage(message);
+                    msg.setSource(virtualID);
+                    tourNN.sendRight(msg, nodes);
+                    break;
                 case "3":
-                msgCounter++;
-                System.out.println("<virtual sender> <message left>");
-                virtualID = scanner2.nextInt();
-                message = scanner2.nextLine();
-                msg = new Message(msgCounter);
-                msg.setMessage(message);
-                msg.setSource(virtualID);
-                tourNN.sendLeft(msg, nodes);
-                break;
+                    msgCounter++;
+                    System.out.println("<virtual sender> <message left>");
+                    virtualID = scanner2.nextInt();
+                    message = scanner2.nextLine();
+                    msg = new Message(msgCounter);
+                    msg.setMessage(message);
+                    msg.setSource(virtualID);
+                    tourNN.sendLeft(msg, nodes);
+                    break;
                 case "4":
-                exiting = false;
-                scanner2.close();
-                System.exit(0);
-                break;
+                    exiting = false;
+                    scanner2.close();
+                    System.exit(0);
+                    break;
             }
         }
-
 
     }
 

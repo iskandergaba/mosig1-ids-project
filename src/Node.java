@@ -1,3 +1,4 @@
+
 //Why does it print the result after the menu? 
 import java.io.IOException;
 import java.util.Map;
@@ -10,7 +11,6 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
@@ -49,49 +49,48 @@ public class Node {
         ConnectionFactory factory = new ConnectionFactory();
         try (Connection connection = factory.newConnection(); Channel channel = connection.createChannel()) {
             channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.DIRECT);
-            channel.basicPublish(EXCHANGE_NAME, nextHop, null, os.toByteArray()); objectOutputStream.close();
+            channel.basicPublish(EXCHANGE_NAME, nextHop, null, os.toByteArray());
+            objectOutputStream.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public String returnID()
-    {
-      return this.id;
+    public String returnID() {
+        return this.id;
     }
 
     private DeliverCallback receiveCallback = (consumerTag, delivery) -> {
-//        String message = new String(delivery.getBody(), "UTF-8");
+        // String message = new String(delivery.getBody(), "UTF-8");
         ByteArrayInputStream is = new ByteArrayInputStream(delivery.getBody());
         try (ObjectInputStream ois = new ObjectInputStream(is)) {
-          Message msg = (Message) ois.readObject();
-          if ((msg.getMessage()==null)||(msg.getDestination()==null)) {
-              throw new IllegalArgumentException("Invalid 'message' format.");
-          }
-          if (id.equals(msg.getDestination())) {
-              // This node is the final hop. Print the message.
-              System.out.println(msg.toString());
-          } else {
-               //Send the message to the next hop
-              send(msg);
-          }
+            Message msg = (Message) ois.readObject();
+            if ((msg.getMessage() == null) || (msg.getDestination() == null)) {
+                throw new IllegalArgumentException("Invalid 'message' format.");
+            }
+            if (id.equals(msg.getDestination())) {
+                // This node is the final hop. Print the message.
+                System.out.println(msg.toString());
+            } else {
+                // Send the message to the next hop
+                send(msg);
+            }
+        } catch (ClassNotFoundException e) {
+            System.out.println("Error when trying to deserialize package.");
         }
-        catch (ClassNotFoundException  e) {
-                System.out.println("Error when trying to deserialize package.");
-              }
         return;
-        //String[] tokens = message.split(",", 2);
-        //if (tokens.length < 2) {
-        //    throw new IllegalArgumentException("Invalid 'message' format.");
-        //}
+        // String[] tokens = message.split(",", 2);
+        // if (tokens.length < 2) {
+        // throw new IllegalArgumentException("Invalid 'message' format.");
+        // }
 
-        //String target = tokens[0];
-        //if (id.equals(target)) {
-            // This node is the final hop. Print the message.
-        //    System.out.println(tokens[1]);
-        //} else {
-            // Send the message to the next hop
-        //    send(msg);
-        //}
+        // String target = tokens[0];
+        // if (id.equals(target)) {
+        // This node is the final hop. Print the message.
+        // System.out.println(tokens[1]);
+        // } else {
+        // Send the message to the next hop
+        // send(msg);
+        // }
     };
 }
