@@ -13,8 +13,7 @@ import java.util.concurrent.TimeoutException;
 public class Main {
 
     private static int nodeCount;
-
-    public static void main(String[] args) throws IOException, TimeoutException {
+    public static void main(String[] args) throws IOException, TimeoutException  {
 
         if (args.length < 1) {
             System.out.println("Missing argument: topology description file");
@@ -52,6 +51,68 @@ public class Main {
             Node node = new Node(Integer.toString(i), routingTables.get(i));
             nodes.add(node);
         }
+        // Get ring topology
+        RingNode tourNN = new RingNode();
+        tourNN.tour(graph, nodeCount, 0);
+        // Print overlay topology - not sure about this one
+        System.out.println("You are working with network:");
+        tourNN.printRing();
+        // overlay nodes are available at tourNN.ring
+        // Interact with the user
+        Scanner scanner2 = new Scanner(System.in);
+        String action;
+        boolean exiting = true;
+        int virtualID, physicalID;
+        String destID, message;
+        int msgCounter = 0;
+        Message msg;
+        while (exiting) {
+            System.out.println("\nChoose action: \n 1. Send message on physical level \n 2. SendRight on virtual level \n 3. SendLeft on virtual level \n 4. Exit");
+            action = scanner2.nextLine();
+            switch (action) {
+                case "1":
+                msgCounter++;
+                System.out.println("<sender> <destination @> <message>");
+                physicalID = scanner2.nextInt();
+                destID = scanner2.next();
+                message = scanner2.nextLine();
+                msg = new Message(msgCounter);
+                msg.setMessage(message);
+                msg.setSource(physicalID);
+                msg.setDestination(destID);
+                msg.setDirection(Message.Direction.Direct);
+                //System.out.println(node s.get(physicalID).returnID());
+                nodes.get(physicalID).send(msg);
+                break;
+                case "2":
+                msgCounter++;
+                System.out.println("<virtual sender> <message>");
+                virtualID = scanner2.nextInt();
+                message = scanner2.nextLine();
+                msg = new Message(msgCounter);
+                msg.setMessage(message);
+                msg.setSource(virtualID);
+                tourNN.sendRight(msg, nodes);
+                break;
+                case "3":
+                msgCounter++;
+                System.out.println("<virtual sender> <message left>");
+                virtualID = scanner2.nextInt();
+                message = scanner2.nextLine();
+                msg = new Message(msgCounter);
+                msg.setMessage(message);
+                msg.setSource(virtualID);
+                tourNN.sendLeft(msg, nodes);
+                break;
+                case "4":
+                exiting = false;
+                scanner2.close();
+                System.exit(0);
+                break;
+            }
+        }
+
+
     }
 
     // Check if the topology is a connected graph (Depth-First Traversal)
