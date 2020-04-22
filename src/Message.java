@@ -10,7 +10,7 @@ public class Message implements Serializable {
 
 	private int id;
 	private String dest;
-	private int src;
+	private String src;
 	private String message;
 	private Direction direction = Direction.Direct;
 
@@ -57,11 +57,11 @@ public class Message implements Serializable {
 		this.id = id;
 	}
 
-	public int getSource() {
+	public String getSource() {
 		return src;
 	}
 
-	public void setSource(int setSrc) {
+	public void setSource(String setSrc) {
 		this.src = setSrc;
 	}
 }

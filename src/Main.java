@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Scanner;
 import java.util.concurrent.TimeoutException;
+import java.util.Stack;
+import java.util.Iterator;
 
 public class Main {
 
@@ -53,12 +55,17 @@ public class Main {
             nodes.add(node);
         }
         // Get ring topology
-        RingNode tourNN = new RingNode();
-        tourNN.tour(graph, nodeCount, 0);
+        List<Integer> ring = tour(graph, nodeCount, 0);
         // Print overlay topology - not sure about this one
         System.out.println("You are working with network:");
-        tourNN.printRing();
-        // overlay nodes are available at tourNN.ring
+        printRing(ring);
+        
+        // Create overlay network
+        List<VirtualNode> vnodes = new ArrayList<>();
+        for (int i = 0; i < nodeCount; i++) {
+            VirtualNode vnode = new VirtualNode(nodes.get(ring.get(i)), Integer.toString(ring.get((i + ring.size() - 1) % ring.size())), Integer.toString(ring.get((i+1)%ring.size())));
+            vnodes.add(vnode);
+        }
         // Interact with the user
         Scanner scanner2 = new Scanner(System.in);
         String action;
@@ -80,31 +87,31 @@ public class Main {
                     message = scanner2.nextLine();
                     msg = new Message(msgCounter);
                     msg.setMessage(message);
-                    msg.setSource(physicalID);
+                    msg.setSource(Integer.toString(physicalID));
                     msg.setDestination(destID);
                     msg.setDirection(Message.Direction.Direct);
-                    // System.out.println(node s.get(physicalID).returnID());
                     nodes.get(physicalID).send(msg);
                     break;
                 case "2":
                     msgCounter++;
-                    System.out.println("<virtual sender> <message>");
+                    System.out.println("<sender> <message>");
                     virtualID = scanner2.nextInt();
                     message = scanner2.nextLine();
                     msg = new Message(msgCounter);
                     msg.setMessage(message);
-                    msg.setSource(virtualID);
-                    tourNN.sendRight(msg, nodes);
+                    msg.setSource(Integer.toString(virtualID));
+                    vnodes.get(virtualID).SendRight(msg);
                     break;
                 case "3":
                     msgCounter++;
-                    System.out.println("<virtual sender> <message left>");
+                    System.out.println("<sender> <message>");
                     virtualID = scanner2.nextInt();
                     message = scanner2.nextLine();
                     msg = new Message(msgCounter);
                     msg.setMessage(message);
-                    msg.setSource(virtualID);
-                    tourNN.sendLeft(msg, nodes);
+                    msg.setSource(Integer.toString(virtualID));
+                    vnodes.get(virtualID).SendLeft(msg);
+
                     break;
                 case "4":
                     exiting = false;
@@ -191,5 +198,45 @@ public class Main {
             paths.add(path);
         }
         return paths;
+    }
+    private static List<Integer> tour(boolean graph[][], int nnodes, int start)
+
+    {   
+        Stack<Integer> stack = new Stack<Integer>();;
+        List<Integer> ring = new ArrayList<Integer>();
+        int[] visited = new int[nnodes + 1];
+        visited[start] = 1;
+        stack.push(start);
+        int element, dst = 0, i;
+        boolean minFlag = false;
+        ring.add(start);
+        while (!stack.isEmpty()) {
+            element = stack.peek();
+
+            i = 0;
+            while (i < nnodes) {
+                if ((graph[element][i] == true) && visited[i] == 0) {
+                    dst = i;
+                    minFlag = true;
+                    break;
+                }
+                i++;
+            }
+            if (minFlag) {
+                visited[dst] = 1;
+                stack.push(dst);
+                minFlag = false;
+                ring.add(dst);
+                continue;
+            }
+            stack.pop();
+        }
+        return ring;
+    }
+    public static void printRing(List<Integer> ring) {
+        
+        for (int i =0; i<ring.size(); i++)
+            System.out.print(ring.get(i) + "\t");
+        
     }
 }
