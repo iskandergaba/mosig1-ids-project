@@ -15,8 +15,8 @@ make
 
 Start a chat `Main` like this:
 ~~~~
-cd ../class
-java -cp .:../lib/* Main topology-connected
+cd ../bin
+java -cp Main.jar:../lib/* Main topology-disconnected
 ~~~~
 
 ## Docker
@@ -35,6 +35,11 @@ make clean
 + RabbitMQ nodes can send, route, and receive messages.
 
 ## Bonus
+
+## TODO
+- Nearest Neighbor algorithm improvements
+- Work on a solution for the unsynchronized printing, either logging to an external file or visualize on a graph.
+- Visualize the topologies upon the start of the program
 
 # System Requirements
 + OpenJDK v11 or higher.
