@@ -56,8 +56,8 @@ public class Main {
         Node[] nodes = new Node[nodeCount];
         VirtualNode[] vnodes = new VirtualNode[nodeCount];
         for (int i = 0; i < nodeCount; i++) {
-            Node node = new Node(Integer.toString(i), routingTables.get(i));
-            nodes[i] = node;
+            Node node = new Node(Integer.toString(ring.get(i)), routingTables.get(ring.get(i)));
+            nodes[ring.get(i)] = node;
             String left = Integer.toString(ring.get((i + nodeCount - 1) % nodeCount));
             String right = Integer.toString(ring.get((i + 1) % nodeCount));
             VirtualNode vnode = new VirtualNode(node, left, right);
@@ -68,9 +68,8 @@ public class Main {
         scanner = new Scanner(System.in);
         String action;
         boolean exiting = true;
-        int virtualID, physicalID, destID;
+        int srcId, destId;
         String message;
-        int msgCounter = 0;
         Message msg;
         while (exiting) {
             System.out.println(
@@ -78,45 +77,41 @@ public class Main {
             action = scanner.nextLine();
             switch (action) {
                 case "1":
-                    System.out.println("<sender> <destination @> <message>");
-                    physicalID = scanner.nextInt();
-                    destID = scanner.nextInt();
+                    System.out.println("<sender> <destination> <message>");
+                    srcId = scanner.nextInt();
+                    destId = scanner.nextInt();
                     message = scanner.nextLine();
-                    if (destID == physicalID) {
+                    if (destId == srcId) {
                         System.out.println("You can't send the message to the sender");
-                    } else if ((physicalID >= nodeCount) || (physicalID < 0) || (destID >= nodeCount) || (destID < 0)) {
+                    } else if ((srcId >= nodeCount) || (srcId < 0) || (destId >= nodeCount) || (destId < 0)) {
                         System.out.println("The node does not exist in the topology");
                     } else {
-                        msgCounter++;
-                        msg = new Message(msgCounter, message);
-                        msg.setSource(Integer.toString(physicalID));
-                        msg.setDestination(Integer.toString(destID));
-                        msg.setDirection(Message.Direction.Direct);
-                        nodes[physicalID].send(msg);
+                        msg = new Message(message);
+                        msg.setSource(Integer.toString(srcId));
+                        msg.setDestination(Integer.toString(destId));
+                        nodes[srcId].send(msg);
                     }
                     break;
                 case "2":
                     System.out.println("<sender> <message>");
-                    virtualID = scanner.nextInt();
+                    srcId = scanner.nextInt();
                     message = scanner.nextLine();
-                    if ((virtualID >= nodeCount) || (virtualID < 0)) {
+                    if ((srcId >= nodeCount) || (srcId < 0)) {
                         System.out.println("The node does not exist in the topology");
                     } else {
-                        msgCounter++;
-                        msg = new Message(msgCounter, message);
-                        vnodes[virtualID].SendRight(msg);
+                        msg = new Message(message);
+                        vnodes[srcId].sendRight(msg);
                     }
                     break;
                 case "3":
                     System.out.println("<sender> <message>");
-                    virtualID = scanner.nextInt();
+                    srcId = scanner.nextInt();
                     message = scanner.nextLine();
-                    if ((virtualID >= nodeCount) || (virtualID < 0)) {
+                    if ((srcId >= nodeCount) || (srcId < 0)) {
                         System.out.println("The node does not exist in the topology");
                     } else {
-                        msgCounter++;
-                        msg = new Message(msgCounter, message);
-                        vnodes[virtualID].SendLeft(msg);
+                        msg = new Message(message);
+                        vnodes[srcId].sendLeft(msg);
                     }
                     break;
                 case "4":

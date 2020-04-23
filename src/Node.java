@@ -61,7 +61,6 @@ public class Node {
     }
 
     private DeliverCallback receiveCallback = (consumerTag, delivery) -> {
-        // String message = new String(delivery.getBody(), "UTF-8");
         ByteArrayInputStream is = new ByteArrayInputStream(delivery.getBody());
         try (ObjectInputStream ois = new ObjectInputStream(is)) {
             Message msg = (Message) ois.readObject();
@@ -72,7 +71,9 @@ public class Node {
                 // This node is the final hop. Print the message.
                 System.out.println(msg.toString());
             } else {
-                //System.out.println(id + ": Forwarding");
+                // For debugging purposes
+                // System.out.println(id + ": Forwarding");
+                
                 // Send the message to the next hop
                 send(msg);
             }

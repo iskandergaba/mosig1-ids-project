@@ -26,17 +26,15 @@ public class VirtualNode {
 		return rightNeighbor;
 	}
 
-    public void SendLeft(Message msg) throws IOException {
+    public void sendLeft(Message msg) throws IOException {
         msg.setSource(node.getId());
-        msg.setDirection(Message.Direction.Left);
         msg.setDestination(leftNeighbor);
         node.send(msg);
 
     }
 
-    public void SendRight(Message msg) throws IOException {
+    public void sendRight(Message msg) throws IOException {
         msg.setSource(node.getId());
-        msg.setDirection(Message.Direction.Right);
         msg.setDestination(rightNeighbor);
         node.send(msg);
     }

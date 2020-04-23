@@ -4,16 +4,11 @@ public class Message implements Serializable {
 
 	private static final long serialVersionUID = 1234L;
 
-	public enum Direction {
-		Left, Right, Direct
-	}
-
-	private int id;
+	private static int ID = 0;
 	private String src, dest, message;
-	private Direction direction = Direction.Direct;
 
-	public Message(int id, String message) {
-		this.id = id;
+	public Message(String message) {
+		ID++;
 		this.message = message;
 	}
 
@@ -33,22 +28,6 @@ public class Message implements Serializable {
 		this.message = message;
 	}
 
-	public Direction getDirection() {
-		return direction;
-	}
-
-	public void setDirection(Direction direction) {
-		this.direction = direction;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
 	public String getSource() {
 		return src;
 	}
@@ -59,7 +38,7 @@ public class Message implements Serializable {
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("M").append(id).append(" - ").append(src).append(" => ").append(dest).append(": ").append(message);
+		sb.append("Message #").append(ID).append(" - ").append(src).append(" => ").append(dest).append(":").append(message);
 		return sb.toString();
 	}
 }
