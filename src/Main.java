@@ -48,11 +48,15 @@ public class Main {
         // Get routing tables for nodes from any node to any other node
         List<Map<String, String>> routingTables = getRoutingTables(graph);
 
-        // Create underlay nodes
+        // Create underlay and overlay nodes
         List<Node> nodes = new ArrayList<>();
+        List<VirtualNode> vnodes = new ArrayList<>();
         for (int i = 0; i < nodeCount; i++) {
             Node node = new Node(Integer.toString(i), routingTables.get(i));
             nodes.add(node);
+            VirtualNode vnode = new VirtualNode(node);
+            vnodes.add(vnode);
+
         }
         // Get ring topology
         List<Integer> ring = tour(graph, nodeCount, 0);
@@ -60,12 +64,12 @@ public class Main {
         System.out.println("You are working with network:");
         printRing(ring);
         
-        // Create overlay network
-        List<VirtualNode> vnodes = new ArrayList<>();
+        //Set the connection between virtual nodes
         for (int i = 0; i < nodeCount; i++) {
-            VirtualNode vnode = new VirtualNode(nodes.get(ring.get(i)), Integer.toString(ring.get((i + ring.size() - 1) % ring.size())), Integer.toString(ring.get((i+1)%ring.size())));
-            vnodes.add(vnode);
+            vnodes.get(ring.get(i)).setLeftNeighbour(Integer.toString(ring.get((i+nodeCount-1)%nodeCount)));
+            vnodes.get(ring.get(i)).setRightNeighbour(Integer.toString(ring.get((i+1)%nodeCount))); 
         }
+        
         // Interact with the user
         Scanner scanner2 = new Scanner(System.in);
         String action;
@@ -80,38 +84,56 @@ public class Main {
             action = scanner2.nextLine();
             switch (action) {
                 case "1":
-                    msgCounter++;
                     System.out.println("<sender> <destination @> <message>");
                     physicalID = scanner2.nextInt();
                     destID = scanner2.next();
                     message = scanner2.nextLine();
-                    msg = new Message(msgCounter);
-                    msg.setMessage(message);
-                    msg.setSource(Integer.toString(physicalID));
-                    msg.setDestination(destID);
-                    msg.setDirection(Message.Direction.Direct);
-                    nodes.get(physicalID).send(msg);
+                    if ( destID.compareTo(Integer.toString(physicalID)) == 0) {
+                        System.out.println("You can't send the message to the sender");
+                        }
+                    else if ((physicalID>=nodeCount)||(physicalID<0)||(Integer.parseInt(destID)>=nodeCount)||(Integer.parseInt(destID)<0)) {
+                        System.out.println("The node does not exist in the topology");    
+                    }
+                    else {
+                        msgCounter++;
+                        msg = new Message(msgCounter);
+                        msg.setMessage(message);
+                        msg.setSource(Integer.toString(physicalID));
+                        msg.setDestination(destID);
+                        msg.setDirection(Message.Direction.Direct);
+                        nodes.get(physicalID).send(msg);
+                    }
                     break;
                 case "2":
-                    msgCounter++;
+                    
                     System.out.println("<sender> <message>");
                     virtualID = scanner2.nextInt();
                     message = scanner2.nextLine();
-                    msg = new Message(msgCounter);
-                    msg.setMessage(message);
-                    msg.setSource(Integer.toString(virtualID));
-                    vnodes.get(virtualID).SendRight(msg);
+                    if ((virtualID>=nodeCount)||(virtualID<0)) {
+                        System.out.println("The node does not exist in the topology");    
+                    }
+                    else {
+                        msgCounter++;
+                        msg = new Message(msgCounter);
+                        msg.setMessage(message);
+                        msg.setSource(Integer.toString(virtualID));
+                        vnodes.get(virtualID).SendRight(msg);
+                    }
                     break;
                 case "3":
-                    msgCounter++;
                     System.out.println("<sender> <message>");
                     virtualID = scanner2.nextInt();
                     message = scanner2.nextLine();
-                    msg = new Message(msgCounter);
-                    msg.setMessage(message);
-                    msg.setSource(Integer.toString(virtualID));
-                    vnodes.get(virtualID).SendLeft(msg);
-
+                    if ((virtualID>=nodeCount)||(virtualID<0)) {
+                        System.out.println("The node does not exist in the topology");    
+                    }
+                    else {
+                        msgCounter++;
+                        msg = new Message(msgCounter);
+                        msg.setMessage(message);
+                        msg.setSource(Integer.toString(virtualID));
+                        vnodes.get(virtualID).SendLeft(msg);
+                    }
                     break;
                 case "4":
                     exiting = false;

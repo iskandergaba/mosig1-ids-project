@@ -5,11 +5,27 @@ public class VirtualNode {
     private String leftNeighbour;
     private String rightNeighbour;
 
-    VirtualNode(Node Node, String leftNeighbour, String rightNeighbour) throws IOException {
+    VirtualNode(Node Node) throws IOException {
         this.Node = Node;
         this.leftNeighbour = leftNeighbour;
         this.rightNeighbour = rightNeighbour;
     }
+
+    public void setLeftNeighbour(String leftNeighbour) {
+		this.leftNeighbour = leftNeighbour;
+	}
+
+	public String getLeftNeighbour() {
+		return leftNeighbour;
+	}
+
+	public void setRightNeighbour(String rightNeighbour) {
+		this.rightNeighbour = rightNeighbour;
+	}
+
+    public String getRightNeighbour() {
+		return rightNeighbour;
+	}
 
     public void SendLeft(Message msg) throws IOException {
         msg.setDirection(Message.Direction.Left);
