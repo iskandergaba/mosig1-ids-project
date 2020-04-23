@@ -16,7 +16,7 @@ make
 Start a chat `Main` like this:
 ~~~~
 cd ../bin
-java -cp Main.jar:../lib/* Main topology-disconnected
+java -cp Main.jar:../lib/* Main topology-connected
 ~~~~
 
 ## Docker
