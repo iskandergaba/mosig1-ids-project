@@ -9,20 +9,12 @@ public class Message implements Serializable {
 	}
 
 	private int id;
-	private String dest;
-	private String src;
-	private String message;
+	private String src, dest, message;
 	private Direction direction = Direction.Direct;
 
-	public Message(int id) {
+	public Message(int id, String message) {
 		this.id = id;
-	}
-
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("M").append(id).append(": ").append(message).append(" to: ").append(dest).append(", from: ")
-				.append(src);
-		return sb.toString();
+		this.message = message;
 	}
 
 	public String getDestination() {
@@ -63,5 +55,11 @@ public class Message implements Serializable {
 
 	public void setSource(String setSrc) {
 		this.src = setSrc;
+	}
+
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("M").append(id).append(" - ").append(src).append(" => ").append(dest).append(": ").append(message);
+		return sb.toString();
 	}
 }

@@ -1,43 +1,43 @@
 import java.io.IOException;
 
 public class VirtualNode {
-    private Node Node;
-    private String leftNeighbour;
-    private String rightNeighbour;
+    private Node node;
+    private String leftNeighbor, rightNeighbor;
 
-    VirtualNode(Node Node) throws IOException {
-        this.Node = Node;
-        this.leftNeighbour = leftNeighbour;
-        this.rightNeighbour = rightNeighbour;
+    VirtualNode(Node Node, String leftNeighbor, String rightNeighbor) throws IOException {
+        this.node = Node;
+        this.leftNeighbor = leftNeighbor;
+        this.rightNeighbor = rightNeighbor;
     }
 
-    public void setLeftNeighbour(String leftNeighbour) {
-		this.leftNeighbour = leftNeighbour;
+    public void setLeftNeighbor(String leftNeighbor) {
+		this.leftNeighbor = leftNeighbor;
 	}
 
-	public String getLeftNeighbour() {
-		return leftNeighbour;
+	public String getLeftNeighbor() {
+		return leftNeighbor;
 	}
 
-	public void setRightNeighbour(String rightNeighbour) {
-		this.rightNeighbour = rightNeighbour;
+	public void setRightNeighbor(String rightNeighbor) {
+		this.rightNeighbor = rightNeighbor;
 	}
 
-    public String getRightNeighbour() {
-		return rightNeighbour;
+    public String getRightNeighbor() {
+		return rightNeighbor;
 	}
 
     public void SendLeft(Message msg) throws IOException {
+        msg.setSource(node.getId());
         msg.setDirection(Message.Direction.Left);
-        msg.setDestination(this.leftNeighbour);
-        this.Node.send(msg);
+        msg.setDestination(leftNeighbor);
+        node.send(msg);
 
     }
 
     public void SendRight(Message msg) throws IOException {
-        //msg.setSource(this.Node.returnID());
+        msg.setSource(node.getId());
         msg.setDirection(Message.Direction.Right);
-        msg.setDestination(this.rightNeighbour);
-        this.Node.send(msg);
+        msg.setDestination(rightNeighbor);
+        node.send(msg);
     }
 }

@@ -36,6 +36,10 @@ public class Node {
         });
     }
 
+    public String getId() {
+        return id;
+    }
+
     public void send(Message message) throws IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(os);
@@ -56,10 +60,6 @@ public class Node {
         }
     }
 
-    public String returnID() {
-        return this.id;
-    }
-
     private DeliverCallback receiveCallback = (consumerTag, delivery) -> {
         // String message = new String(delivery.getBody(), "UTF-8");
         ByteArrayInputStream is = new ByteArrayInputStream(delivery.getBody());
@@ -72,6 +72,7 @@ public class Node {
                 // This node is the final hop. Print the message.
                 System.out.println(msg.toString());
             } else {
+                //System.out.println(id + ": Forwarding");
                 // Send the message to the next hop
                 send(msg);
             }
@@ -79,18 +80,5 @@ public class Node {
             System.out.println("Error when trying to deserialize package.");
         }
         return;
-        // String[] tokens = message.split(",", 2);
-        // if (tokens.length < 2) {
-        // throw new IllegalArgumentException("Invalid 'message' format.");
-        // }
-
-        // String target = tokens[0];
-        // if (id.equals(target)) {
-        // This node is the final hop. Print the message.
-        // System.out.println(tokens[1]);
-        // } else {
-        // Send the message to the next hop
-        // send(msg);
-        // }
     };
 }

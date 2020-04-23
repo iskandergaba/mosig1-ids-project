@@ -10,7 +10,6 @@ import java.util.Queue;
 import java.util.Scanner;
 import java.util.concurrent.TimeoutException;
 import java.util.Stack;
-import java.util.Iterator;
 
 public class Main {
 
@@ -47,102 +46,86 @@ public class Main {
 
         // Get routing tables for nodes from any node to any other node
         List<Map<String, String>> routingTables = getRoutingTables(graph);
-
-        // Create underlay and overlay nodes
-        List<Node> nodes = new ArrayList<>();
-        List<VirtualNode> vnodes = new ArrayList<>();
-        for (int i = 0; i < nodeCount; i++) {
-            Node node = new Node(Integer.toString(i), routingTables.get(i));
-            nodes.add(node);
-            VirtualNode vnode = new VirtualNode(node);
-            vnodes.add(vnode);
-
-        }
         // Get ring topology
         List<Integer> ring = tour(graph, nodeCount, 0);
         // Print overlay topology - not sure about this one
         System.out.println("You are working with network:");
         printRing(ring);
-        
-        //Set the connection between virtual nodes
+
+        // Create underlay and overlay nodes
+        Node[] nodes = new Node[nodeCount];
+        VirtualNode[] vnodes = new VirtualNode[nodeCount];
         for (int i = 0; i < nodeCount; i++) {
-            vnodes.get(ring.get(i)).setLeftNeighbour(Integer.toString(ring.get((i+nodeCount-1)%nodeCount)));
-            vnodes.get(ring.get(i)).setRightNeighbour(Integer.toString(ring.get((i+1)%nodeCount))); 
+            Node node = new Node(Integer.toString(i), routingTables.get(i));
+            nodes[i] = node;
+            String left = Integer.toString(ring.get((i + nodeCount - 1) % nodeCount));
+            String right = Integer.toString(ring.get((i + 1) % nodeCount));
+            VirtualNode vnode = new VirtualNode(node, left, right);
+            vnodes[ring.get(i)] = vnode;
         }
-        
+
         // Interact with the user
-        Scanner scanner2 = new Scanner(System.in);
+        scanner = new Scanner(System.in);
         String action;
         boolean exiting = true;
-        int virtualID, physicalID;
-        String destID, message;
+        int virtualID, physicalID, destID;
+        String message;
         int msgCounter = 0;
         Message msg;
         while (exiting) {
             System.out.println(
                     "\nChoose action: \n 1. Send message on physical level \n 2. SendRight on virtual level \n 3. SendLeft on virtual level \n 4. Exit");
-            action = scanner2.nextLine();
+            action = scanner.nextLine();
             switch (action) {
                 case "1":
                     System.out.println("<sender> <destination @> <message>");
-                    physicalID = scanner2.nextInt();
-                    destID = scanner2.next();
-                    message = scanner2.nextLine();
-                    if ( destID.compareTo(Integer.toString(physicalID)) == 0) {
+                    physicalID = scanner.nextInt();
+                    destID = scanner.nextInt();
+                    message = scanner.nextLine();
+                    if (destID == physicalID) {
                         System.out.println("You can't send the message to the sender");
-                        }
-                    else if ((physicalID>=nodeCount)||(physicalID<0)||(Integer.parseInt(destID)>=nodeCount)||(Integer.parseInt(destID)<0)) {
-                        System.out.println("The node does not exist in the topology");    
-                    }
-                    else {
+                    } else if ((physicalID >= nodeCount) || (physicalID < 0) || (destID >= nodeCount) || (destID < 0)) {
+                        System.out.println("The node does not exist in the topology");
+                    } else {
                         msgCounter++;
-                        msg = new Message(msgCounter);
-                        msg.setMessage(message);
+                        msg = new Message(msgCounter, message);
                         msg.setSource(Integer.toString(physicalID));
-                        msg.setDestination(destID);
+                        msg.setDestination(Integer.toString(destID));
                         msg.setDirection(Message.Direction.Direct);
-                        nodes.get(physicalID).send(msg);
+                        nodes[physicalID].send(msg);
                     }
                     break;
                 case "2":
-                    
                     System.out.println("<sender> <message>");
-                    virtualID = scanner2.nextInt();
-                    message = scanner2.nextLine();
-                    if ((virtualID>=nodeCount)||(virtualID<0)) {
-                        System.out.println("The node does not exist in the topology");    
-                    }
-                    else {
+                    virtualID = scanner.nextInt();
+                    message = scanner.nextLine();
+                    if ((virtualID >= nodeCount) || (virtualID < 0)) {
+                        System.out.println("The node does not exist in the topology");
+                    } else {
                         msgCounter++;
-                        msg = new Message(msgCounter);
-                        msg.setMessage(message);
-                        msg.setSource(Integer.toString(virtualID));
-                        vnodes.get(virtualID).SendRight(msg);
+                        msg = new Message(msgCounter, message);
+                        vnodes[virtualID].SendRight(msg);
                     }
                     break;
                 case "3":
                     System.out.println("<sender> <message>");
-                    virtualID = scanner2.nextInt();
-                    message = scanner2.nextLine();
-                    if ((virtualID>=nodeCount)||(virtualID<0)) {
-                        System.out.println("The node does not exist in the topology");    
-                    }
-                    else {
+                    virtualID = scanner.nextInt();
+                    message = scanner.nextLine();
+                    if ((virtualID >= nodeCount) || (virtualID < 0)) {
+                        System.out.println("The node does not exist in the topology");
+                    } else {
                         msgCounter++;
-                        msg = new Message(msgCounter);
-                        msg.setMessage(message);
-                        msg.setSource(Integer.toString(virtualID));
-                        vnodes.get(virtualID).SendLeft(msg);
+                        msg = new Message(msgCounter, message);
+                        vnodes[virtualID].SendLeft(msg);
                     }
                     break;
                 case "4":
                     exiting = false;
-                    scanner2.close();
+                    scanner.close();
                     System.exit(0);
                     break;
             }
         }
-
     }
 
     // Check if the topology is a connected graph (Depth-First Traversal)
@@ -221,10 +204,10 @@ public class Main {
         }
         return paths;
     }
-    private static List<Integer> tour(boolean graph[][], int nnodes, int start)
 
-    {   
-        Stack<Integer> stack = new Stack<Integer>();;
+    // Construct the overlay ring topology (Nearest-Neighbor Algorithm)
+    private static List<Integer> tour(boolean graph[][], int nnodes, int start) {
+        Stack<Integer> stack = new Stack<Integer>();
         List<Integer> ring = new ArrayList<Integer>();
         int[] visited = new int[nnodes + 1];
         visited[start] = 1;
@@ -234,7 +217,6 @@ public class Main {
         ring.add(start);
         while (!stack.isEmpty()) {
             element = stack.peek();
-
             i = 0;
             while (i < nnodes) {
                 if ((graph[element][i] == true) && visited[i] == 0) {
@@ -255,10 +237,11 @@ public class Main {
         }
         return ring;
     }
+
+    // Print the ring topology
     public static void printRing(List<Integer> ring) {
-        
-        for (int i =0; i<ring.size(); i++)
+        for (int i = 0; i < ring.size(); i++)
             System.out.print(ring.get(i) + "\t");
-        
+
     }
 }
