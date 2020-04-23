@@ -32,10 +32,11 @@ public class Message implements Serializable {
 		return src;
 	}
 
-	public void setSource(String setSrc) {
-		this.src = setSrc;
+	public void setSource(String src) {
+		this.src = src;
 	}
 
+	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Message #").append(ID).append(" - ").append(src).append(" => ").append(dest).append(":").append(message);

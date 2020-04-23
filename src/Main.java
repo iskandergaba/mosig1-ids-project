@@ -99,8 +99,7 @@ public class Main {
                     if ((srcId >= nodeCount) || (srcId < 0)) {
                         System.out.println("The node does not exist in the topology");
                     } else {
-                        msg = new Message(message);
-                        vnodes[srcId].sendRight(msg);
+                        vnodes[srcId].sendRight(message);
                     }
                     break;
                 case "3":
@@ -110,8 +109,7 @@ public class Main {
                     if ((srcId >= nodeCount) || (srcId < 0)) {
                         System.out.println("The node does not exist in the topology");
                     } else {
-                        msg = new Message(message);
-                        vnodes[srcId].sendLeft(msg);
+                        vnodes[srcId].sendLeft(message);
                     }
                     break;
                 case "4":

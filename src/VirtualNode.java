@@ -10,32 +10,18 @@ public class VirtualNode {
         this.rightNeighbor = rightNeighbor;
     }
 
-    public void setLeftNeighbor(String leftNeighbor) {
-		this.leftNeighbor = leftNeighbor;
-	}
-
-	public String getLeftNeighbor() {
-		return leftNeighbor;
-	}
-
-	public void setRightNeighbor(String rightNeighbor) {
-		this.rightNeighbor = rightNeighbor;
-	}
-
-    public String getRightNeighbor() {
-		return rightNeighbor;
-	}
-
-    public void sendLeft(Message msg) throws IOException {
-        msg.setSource(node.getId());
-        msg.setDestination(leftNeighbor);
-        node.send(msg);
-
+    public void sendLeft(String text) throws IOException {
+        send(text, leftNeighbor);
     }
 
-    public void sendRight(Message msg) throws IOException {
+    public void sendRight(String text) throws IOException {
+        send(text, rightNeighbor);
+    }
+
+    private void send(String text, String dest) throws IOException {
+        Message msg = new Message(text);
         msg.setSource(node.getId());
-        msg.setDestination(rightNeighbor);
+        msg.setDestination(dest);
         node.send(msg);
     }
 }

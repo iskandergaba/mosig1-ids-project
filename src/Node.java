@@ -69,7 +69,7 @@ public class Node {
             }
             if (id.equals(msg.getDestination())) {
                 // This node is the final hop. Print the message.
-                System.out.println(msg.toString());
+                System.out.println(msg);
             } else {
                 // For debugging purposes
                 // System.out.println(id + ": Forwarding");
