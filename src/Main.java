@@ -51,6 +51,9 @@ public class Main {
             throw new IllegalArgumentException("Invalid adjacency matrix: The graph is not connected.");
         }
 
+        // Get physical exchange channel names (i.e. edges) between any node and its
+        // physical neighbors
+        List<Map<String, String>> exchangeMaps = getExchangeMaps(graph);
         // Get routing tables for nodes from any node to any other node
         List<Map<String, String>> routingTables = getRoutingTables(graph);
         // Get ring topology
@@ -62,7 +65,8 @@ public class Main {
         Node[] nodes = new Node[nodeCount];
         VirtualNode[] vnodes = new VirtualNode[nodeCount];
         for (int i = 0; i < nodeCount; i++) {
-            Node node = new Node(Integer.toString(ring.get(i)), routingTables.get(ring.get(i)));
+            Node node = new Node(Integer.toString(ring.get(i)), exchangeMaps.get(ring.get(i)),
+                    routingTables.get(ring.get(i)));
             nodes[ring.get(i)] = node;
             String left = Integer.toString(ring.get((i + nodeCount - 1) % nodeCount));
             String right = Integer.toString(ring.get((i + 1) % nodeCount));
@@ -161,6 +165,26 @@ public class Main {
             }
         }
         return true;
+    }
+
+    // Get a list of nodes' exchange channel maps
+    private static List<Map<String, String>> getExchangeMaps(boolean[][] graph) {
+        List<Map<String, String>> exchangeMaps = new ArrayList<>();
+        for (int i = 0; i < nodeCount; i++) {
+            Map<String, String> exMap = new HashMap<>();
+            exchangeMaps.add(exMap);
+        }
+
+        for (int i = 0; i < nodeCount; i++) {
+            for (int j = 0; j < nodeCount; j++) {
+                Map<String, String> exMap = exchangeMaps.get(i);
+                if (i != j && graph[i][j]) {
+                    String exchangeId = Integer.toString(Math.min(i, j)) + "-" + Integer.toString(Math.max(i, j));
+                    exMap.put(Integer.toString(j), exchangeId);
+                }
+            }
+        }
+        return exchangeMaps;
     }
 
     // Get a list of nodes' routing tables

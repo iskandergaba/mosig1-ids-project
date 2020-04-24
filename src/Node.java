@@ -14,29 +14,37 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 
 public class Node {
-    public static String EXCHANGE_NAME = "DIRECT";
-
     private String id;
-    private Map<String, String> routingTable;
+    private Map<String, String> exchangeMap, routingTable;
     private Logger logger;
 
-    Node(String id, Map<String, String> routingTable) throws IOException, TimeoutException {
+    Node(String id, Map<String, String> exchangeMap, Map<String, String> routingTable)
+            throws IOException, TimeoutException {
         this.id = id;
         this.routingTable = routingTable;
+        this.exchangeMap = exchangeMap;
 
+        // Initialize the logging
         logger = new Logger(id);
+        logger.log("Node " + id + ": Initializing...");
 
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
         Connection connection = factory.newConnection();
-        Channel channel = connection.createChannel();
-        channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.DIRECT);
-        String queue = channel.queueDeclare().getQueue();
-        channel.queueBind(queue, EXCHANGE_NAME, id);
-        channel.basicConsume(queue, true, receiveCallback, consumerTag -> {
-        });
+        logger.log("Node " + id + ": Setting exchange channels...");
+        for (String exKey : exchangeMap.keySet()) {
+            Channel channel = connection.createChannel();
+            String exId = exchangeMap.get(exKey);
+            channel.exchangeDeclare(exId, BuiltinExchangeType.DIRECT);
+            String queue = channel.queueDeclare().getQueue();
+            channel.queueBind(queue, exId, id);
+            channel.basicConsume(queue, true, receiveCallback, consumerTag -> {
+            });
+            logger.log("Node " + id + ": Exhange channel " + exId + " initialized.");
+        }
         // Log the creation of the node
-        logger.log("Node " + id + " created");
+        logger.log("Node " + id + ": Exchange channels set.");
+        logger.log("Node " + id + ": Ready.");
     }
 
     public String getId() {
@@ -44,6 +52,14 @@ public class Node {
     }
 
     public void send(Message message) throws IOException {
+        send(message, false);
+    }
+
+    public void forward(Message message) throws IOException {
+        send(message, true);
+    }
+
+    private void send(Message message, boolean forward) throws IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(os);
         objectOutputStream.writeObject(message);
@@ -53,11 +69,18 @@ public class Node {
         } else if (message.getDestination() == null) {
             throw new IllegalArgumentException("Invalid 'target' argument.");
         }
+        String exId = exchangeMap.get(nextHop);
         ConnectionFactory factory = new ConnectionFactory();
         try (Connection connection = factory.newConnection(); Channel channel = connection.createChannel()) {
-            channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.DIRECT);
-            channel.basicPublish(EXCHANGE_NAME, nextHop, null, os.toByteArray());
+            channel.exchangeDeclare(exId, BuiltinExchangeType.DIRECT);
+            channel.basicPublish(exId, nextHop, null, os.toByteArray());
             objectOutputStream.close();
+            // Log the passage by this node
+            if (forward) {
+                logger.log("Node " + id + ": Forwarding Message " + message.getId() + "...");
+            } else {
+                logger.log("Node " + id + ": Sending Message " + message.getId() + "...");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -72,12 +95,11 @@ public class Node {
             }
             if (id.equals(msg.getDestination())) {
                 // This node is the final hop. Log the message.
-                logger.log(msg);
+                logger.log("Node " + id + ": Message " + msg.getId() + " received.");
+                logger.log("Node " + id + ": " + msg);
             } else {
-                // Log the passage by this node
-                logger.log("Message #" + msg.getId() + " - Node " + id + " forwarding...");
-                // Send the message to the next hop
-                send(msg);
+                // Forward the message to the next hop
+                forward(msg);
             }
         } catch (ClassNotFoundException e) {
             System.out.println("Error when trying to deserialize package.");

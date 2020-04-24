@@ -43,7 +43,7 @@ public class Message implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Message #").append(id).append(" - Node ").append(src).append(" => Node ").append(dest).append(": \"")
+		sb.append("Message ").append(id).append(" - Node ").append(src).append(" => Node ").append(dest).append(": \"")
 				.append(message).append("\"");
 		return sb.toString();
 	}
