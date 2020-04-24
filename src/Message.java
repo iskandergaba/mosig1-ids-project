@@ -4,11 +4,11 @@ public class Message implements Serializable {
 
 	private static final long serialVersionUID = 1234L;
 
-	private static int ID = 0;
+	private int id;
 	private String src, dest, message;
 
-	public Message(String message) {
-		ID++;
+	public Message(int id, String message) {
+		this.id = id;
 		this.message = message;
 	}
 
@@ -36,10 +36,15 @@ public class Message implements Serializable {
 		this.src = src;
 	}
 
+	public int getId() {
+		return id;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Message #").append(ID).append(" - ").append(src).append(" => ").append(dest).append(":").append(message);
+		sb.append("Message #").append(id).append(" - Node ").append(src).append(" => Node ").append(dest).append(": \"")
+				.append(message).append("\"");
 		return sb.toString();
 	}
 }

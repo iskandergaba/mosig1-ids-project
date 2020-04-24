@@ -1,5 +1,3 @@
-
-//Why does it print the result after the menu? 
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
@@ -20,10 +18,13 @@ public class Node {
 
     private String id;
     private Map<String, String> routingTable;
+    private Logger logger;
 
     Node(String id, Map<String, String> routingTable) throws IOException, TimeoutException {
         this.id = id;
         this.routingTable = routingTable;
+
+        logger = new Logger(id);
 
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
@@ -34,6 +35,8 @@ public class Node {
         channel.queueBind(queue, EXCHANGE_NAME, id);
         channel.basicConsume(queue, true, receiveCallback, consumerTag -> {
         });
+        // Log the creation of the node
+        logger.log("Node " + id + " created");
     }
 
     public String getId() {
@@ -68,12 +71,11 @@ public class Node {
                 throw new IllegalArgumentException("Invalid 'message' format.");
             }
             if (id.equals(msg.getDestination())) {
-                // This node is the final hop. Print the message.
-                System.out.println(msg);
+                // This node is the final hop. Log the message.
+                logger.log(msg);
             } else {
-                // For debugging purposes
-                // System.out.println(id + ": Forwarding");
-                
+                // Log the passage by this node
+                logger.log("Message #" + msg.getId() + " - Node " + id + " forwarding...");
                 // Send the message to the next hop
                 send(msg);
             }

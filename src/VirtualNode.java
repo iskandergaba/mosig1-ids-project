@@ -10,16 +10,16 @@ public class VirtualNode {
         this.rightNeighbor = rightNeighbor;
     }
 
-    public void sendLeft(String text) throws IOException {
-        send(text, leftNeighbor);
+    public void sendLeft(int id, String text) throws IOException {
+        send(id, text, leftNeighbor);
     }
 
-    public void sendRight(String text) throws IOException {
-        send(text, rightNeighbor);
+    public void sendRight(int id, String text) throws IOException {
+        send(id, text, rightNeighbor);
     }
 
-    private void send(String text, String dest) throws IOException {
-        Message msg = new Message(text);
+    private void send(int id, String text, String dest) throws IOException {
+        Message msg = new Message(id, text);
         msg.setSource(node.getId());
         msg.setDestination(dest);
         node.send(msg);

@@ -14,6 +14,13 @@ import java.util.Stack;
 public class Main {
 
     private static int nodeCount;
+    private static int msgId;
+
+    private final static String SEND_LEFT = "1";
+    private final static String SEND_RIGHT = "2";
+    private final static String SEND = "3";
+    private final static String DISPLAY_TOPOLOGY = "4";
+    private final static String EXIT = "5";
 
     public static void main(String[] args) throws IOException, TimeoutException {
 
@@ -49,7 +56,6 @@ public class Main {
         // Get ring topology
         List<Integer> ring = tour(graph, nodeCount, 0);
         // Print overlay topology - not sure about this one
-        System.out.println("You are working with network:");
         printRing(ring);
 
         // Create underlay and overlay nodes
@@ -72,50 +78,70 @@ public class Main {
         String message;
         Message msg;
         while (exiting) {
-            System.out.println(
-                    "\nChoose action: \n 1. Send message on physical level \n 2. SendRight on virtual level \n 3. SendLeft on virtual level \n 4. Exit");
+            System.out.println("\nOptions:\n" + SEND_LEFT + ": Send a message to left virtual neighbor\n" + SEND_RIGHT
+                    + ": Send a message to right virtual neighbor\n" + SEND + ": Send a message on the physical level\n"
+                    + DISPLAY_TOPOLOGY + ": Show the overlay ring\n" + EXIT + ": Exit");
+            System.out.print("Choose an option: ");
             action = scanner.nextLine();
             switch (action) {
-                case "1":
-                    System.out.println("<sender> <destination> <message>");
+                case SEND_LEFT:
+                    System.out.println("<source> <message>");
+                    srcId = scanner.nextInt();
+                    message = scanner.nextLine();
+                    // Message cleaning
+                    if (message.charAt(0) == ' ') {
+                        message = message.substring(1);
+                    }
+                    if ((srcId >= nodeCount) || (srcId < 0)) {
+                        System.out.println("The node does not exist in the topology");
+                    } else {
+                        vnodes[srcId].sendLeft(msgId++, message);
+                    }
+                    break;
+                case SEND_RIGHT:
+                    System.out.println("<source> <message>");
+                    srcId = scanner.nextInt();
+                    message = scanner.nextLine();
+                    // Message cleaning
+                    if (message.charAt(0) == ' ') {
+                        message = message.substring(1);
+                    }
+                    if ((srcId >= nodeCount) || (srcId < 0)) {
+                        System.out.println("The node does not exist in the topology");
+                    } else {
+                        vnodes[srcId].sendRight(msgId++, message);
+                    }
+                    break;
+                case SEND:
+                    System.out.println("<source> <destination> <message>");
                     srcId = scanner.nextInt();
                     destId = scanner.nextInt();
                     message = scanner.nextLine();
+                    // Message cleaning
+                    if (message.charAt(0) == ' ') {
+                        message = message.substring(1);
+                    }
                     if (destId == srcId) {
                         System.out.println("You can't send the message to the sender");
                     } else if ((srcId >= nodeCount) || (srcId < 0) || (destId >= nodeCount) || (destId < 0)) {
                         System.out.println("The node does not exist in the topology");
                     } else {
-                        msg = new Message(message);
+                        msg = new Message(msgId++, message);
                         msg.setSource(Integer.toString(srcId));
                         msg.setDestination(Integer.toString(destId));
                         nodes[srcId].send(msg);
                     }
                     break;
-                case "2":
-                    System.out.println("<sender> <message>");
-                    srcId = scanner.nextInt();
-                    message = scanner.nextLine();
-                    if ((srcId >= nodeCount) || (srcId < 0)) {
-                        System.out.println("The node does not exist in the topology");
-                    } else {
-                        vnodes[srcId].sendRight(message);
-                    }
+                case DISPLAY_TOPOLOGY:
+                    printRing(ring);
                     break;
-                case "3":
-                    System.out.println("<sender> <message>");
-                    srcId = scanner.nextInt();
-                    message = scanner.nextLine();
-                    if ((srcId >= nodeCount) || (srcId < 0)) {
-                        System.out.println("The node does not exist in the topology");
-                    } else {
-                        vnodes[srcId].sendLeft(message);
-                    }
-                    break;
-                case "4":
+                case EXIT:
                     exiting = false;
                     scanner.close();
                     System.exit(0);
+                    break;
+                default:
+                    System.out.println("Invalid option");
                     break;
             }
         }
@@ -233,8 +259,12 @@ public class Main {
 
     // Print the ring topology
     public static void printRing(List<Integer> ring) {
-        for (int i = 0; i < ring.size(); i++)
-            System.out.print(ring.get(i) + "\t");
-
+        System.out.println("\nNetwork ring topology:");
+        System.out.print("↳ ");
+        for (int i = 0; i < ring.size(); i++) {
+            System.out.print(ring.get(i));
+            System.out.print(i == (ring.size() - 1) ? " ↰" : " - ");
+        }
+        System.out.println();
     }
 }

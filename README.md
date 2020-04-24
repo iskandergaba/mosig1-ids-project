@@ -38,7 +38,6 @@ make clean
 
 ## TODO
 - Nearest Neighbor algorithm improvements
-- Work on a solution for the unsynchronized printing, either logging to an external file or visualize on a graph.
 - Visualize the topologies upon the start of the program
 
 # System Requirements
