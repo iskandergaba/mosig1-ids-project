@@ -34,12 +34,6 @@ make clean
 + Find the shortest path between each two nodes and create a routing table for each node such that a node knows just the next hop it should make in order to reach a given target node.
 + RabbitMQ nodes can send, route, and receive messages.
 
-## Bonus
-
-## TODO
-- Nearest Neighbor algorithm improvements
-- Visualize the topologies upon the start of the program
-
 # System Requirements
 + OpenJDK v11 or higher.
 + Docker v19 or higher up and running. 
