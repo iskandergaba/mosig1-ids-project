@@ -55,7 +55,7 @@ public class Node {
         send(message, false);
     }
 
-    public void forward(Message message) throws IOException {
+    private void forward(Message message) throws IOException {
         send(message, true);
     }
 
